@@ -2,8 +2,8 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { projectAsset as asset, publicAsset } from './assets'
-import { capabilities, experiences, metrics, projects } from './content'
+import { projectAsset, publicAsset } from './assets'
+import { advantages, education, experiences, profile, type ResumeBullet } from './content'
 import './App.css'
 
 const HeroScene = lazy(() =>
@@ -30,43 +30,6 @@ const questions = [
   },
 ]
 
-const principles = [
-  {
-    index: '01 / 03',
-    title: '能复用，就不重复建设。',
-    text: '平台价值不来自功能数量，而来自公共能力能否被不同团队反复调用，并持续降低下一次交付成本。',
-    label: 'PLATFORM THINKING',
-  },
-  {
-    index: '02 / 03',
-    title: '先做最短反馈链。',
-    text: '在复杂系统真正投入建设前，先用原型和代码验证用户动作、输入质量与结果是否值得继续放大。',
-    label: 'VIBE CODING',
-  },
-  {
-    index: '03 / 03',
-    title: '规模化之前先可观测。',
-    text: '当 AI 流量变大，容量、成本、安全和质量必须分别看见，否则所谓增长只是更大的黑盒。',
-    label: 'AI GOVERNANCE',
-  },
-]
-
-const experienceImages = [
-  'eureka-orchestration.png',
-  'gateway-observability.png',
-  'ai-studio-home.png',
-]
-
-function DotLink({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <i className="dot" />
-      <span>{children}</span>
-      <b aria-hidden="true">↗</b>
-    </>
-  )
-}
-
 function Curtains({ className = '' }: { className?: string }) {
   return (
     <div className={`curtains ${className}`} aria-hidden="true">
@@ -74,6 +37,61 @@ function Curtains({ className = '' }: { className?: string }) {
         <i key={index} />
       ))}
     </div>
+  )
+}
+
+function SectionHeading({
+  index,
+  title,
+  id,
+}: {
+  index: string
+  title: string
+  id?: string
+}) {
+  return (
+    <div className="resume-heading" id={id} data-reveal>
+      <span>{index}</span>
+      <h2>{title}</h2>
+      <i />
+    </div>
+  )
+}
+
+function ResumeBulletContent({ bullet }: { bullet: ResumeBullet }) {
+  return (
+    <>
+      <div className="bullet-copy">
+        <span className="bullet-mark">●</span>
+        <div>
+          <p>
+            {bullet.title && <strong>【{bullet.title}】：</strong>}
+            {bullet.text}
+          </p>
+          {bullet.subItems?.map((item) => <p className="sub-item" key={item}>{item}</p>)}
+        </div>
+      </div>
+      {bullet.media && (
+        <div className={`evidence-grid evidence-grid--${Math.min(bullet.media.length, 3)}`}>
+          {bullet.media.map((media) => (
+            <figure key={media.sourceName} data-media-reveal>
+              <div>
+                <img
+                  src={projectAsset(media.file)}
+                  alt={media.alt}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <figcaption>
+                <span>{media.sourceName}</span>
+                <small>PROJECT EVIDENCE ↗</small>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+    </>
   )
 }
 
@@ -108,25 +126,22 @@ function App() {
 
       media.add(
         {
-          desktop: '(min-width: 1024px)',
           reduceMotion: '(prefers-reduced-motion: reduce)',
         },
         (context) => {
-          const { desktop, reduceMotion } = context.conditions as {
-            desktop: boolean
+          const { reduceMotion } = context.conditions as {
             reduceMotion: boolean
           }
 
           if (reduceMotion) {
-            gsap.set('[data-reveal], .hero-copy, .scene-loading', { clearProps: 'all' })
+            gsap.set('[data-reveal], [data-media-reveal], .hero-copy', { clearProps: 'all' })
             return
           }
 
           gsap
-            .timeline({ defaults: { duration: 0.65, ease: 'power2.out' } })
+            .timeline({ defaults: { duration: 0.7, ease: 'power2.out' } })
             .from('.site-header', { autoAlpha: 0, y: -18 })
-            .from('.hero-copy > *', { autoAlpha: 0, yPercent: 70, stagger: 0.09 }, '-=.2')
-            .from('.scene-loading', { autoAlpha: 0 }, '<')
+            .from('.hero-copy > *', { autoAlpha: 0, yPercent: 70, stagger: 0.09 }, '-=.25')
 
           gsap
             .timeline({
@@ -137,7 +152,7 @@ function App() {
                 scrub: true,
               },
             })
-            .to('.hero-copy', { autoAlpha: 0, yPercent: -35, duration: 0.32 }, 0.34)
+            .to('.hero-copy', { autoAlpha: 0, yPercent: -35, duration: 0.3 }, 0.38)
             .to(
               '.hero-curtains i',
               {
@@ -155,100 +170,34 @@ function App() {
             onEnter: (elements) =>
               gsap.fromTo(
                 elements,
-                { autoAlpha: 0, y: 44 },
+                { autoAlpha: 0, y: 38 },
                 {
                   autoAlpha: 1,
                   y: 0,
                   duration: 0.72,
-                  stagger: 0.07,
+                  stagger: 0.06,
                   ease: 'power2.out',
                 },
               ),
           })
 
-          if (desktop) {
-            gsap.from('.portfolio-item', {
-              autoAlpha: 0,
-              yPercent: 18,
-              stagger: 0.06,
-              ease: 'power2.out',
-              scrollTrigger: {
-                trigger: '.portfolio-grid',
-                start: 'top 82%',
-                toggleActions: 'play none none reverse',
-              },
-            })
-
-            gsap.from('.capability-card > *', {
-              autoAlpha: 0,
-              x: 90,
-              stagger: 0.035,
-              ease: 'power2.out',
-              scrollTrigger: {
-                trigger: '.capability-grid',
-                start: 'top 78%',
-                toggleActions: 'play none none reverse',
-              },
-            })
-          }
-
-          const impactTimeline = gsap.timeline({
-            scrollTrigger: {
-              trigger: '#impact-track',
-              start: 'top top',
-              end: 'bottom bottom',
-              scrub: true,
-            },
+          ScrollTrigger.batch('[data-media-reveal]', {
+            start: 'top 86%',
+            once: true,
+            onEnter: (elements) =>
+              gsap.fromTo(
+                elements,
+                { clipPath: 'inset(0 0 100% 0)', y: 30 },
+                {
+                  clipPath: 'inset(0 0 0% 0)',
+                  y: 0,
+                  duration: 0.9,
+                  stagger: 0.08,
+                  ease: 'power3.out',
+                },
+              ),
           })
 
-          impactTimeline
-            .to(
-              '.impact-start-curtains i',
-              {
-                scaleY: 0,
-                duration: 0.13,
-                stagger: { each: 0.012, from: 'end' },
-                ease: 'none',
-              },
-              0,
-            )
-            .fromTo(
-              '.impact-copy > *',
-              { autoAlpha: 0, yPercent: 90 },
-              { autoAlpha: 1, yPercent: 0, duration: 0.13, stagger: 0.02 },
-              0.1,
-            )
-            .fromTo(
-              '.impact-metrics > *',
-              { autoAlpha: 0, yPercent: 70 },
-              { autoAlpha: 1, yPercent: 0, duration: 0.13, stagger: 0.018 },
-              0.16,
-            )
-            .to('.impact-copy, .impact-metrics', { autoAlpha: 0, duration: 0.08 }, 0.78)
-            .to(
-              '.impact-end-curtains i',
-              {
-                scaleY: 1,
-                duration: 0.13,
-                stagger: { each: 0.012, from: 'start' },
-                ease: 'none',
-              },
-              0.86,
-            )
-
-          if (desktop) {
-            gsap
-              .timeline({
-                scrollTrigger: {
-                  trigger: '.showreel-track',
-                  start: 'top top',
-                  end: 'bottom bottom',
-                  scrub: true,
-                },
-              })
-              .to('.showreel-wrap', { width: '100%', borderWidth: 0, duration: 1 }, 0)
-              .to('.showreel-padding', { padding: 0, borderWidth: 0, duration: 1 }, 0)
-          }
         },
       )
 
@@ -300,14 +249,14 @@ function App() {
       >
         <button type="button" onClick={() => setMenuOpen(false)}>CLOSE ×</button>
         <nav>
-          <a href="#work" onClick={() => setMenuOpen(false)}>Selected work</a>
-          <a href="#capabilities" onClick={() => setMenuOpen(false)}>Capabilities</a>
-          <a href="#about" onClick={() => setMenuOpen(false)}>Experience</a>
+          <a href="#profile" onClick={() => setMenuOpen(false)}>Profile</a>
+          <a href="#advantages" onClick={() => setMenuOpen(false)}>Advantages</a>
+          <a href="#experience" onClick={() => setMenuOpen(false)}>Experience</a>
           <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
         </nav>
         <div>
           <span>AI PRODUCT / HANGZHOU</span>
-          <span>NEVER STOP BUILDING™</span>
+          <span>RESUME / 2026</span>
         </div>
       </div>
 
@@ -348,208 +297,113 @@ function App() {
               <HeroScene />
             </Suspense>
             <div className="hero-copy">
-              <h1>AI 产品经理，专注把复杂模型能力变成可用、可治理、可增长的产品。</h1>
-              <p>NEVER STOP BUILDING™</p>
+              <span>RESUME / AI PRODUCT MANAGER</span>
+              <h1>张子健</h1>
+              <p>AI 产品经理，专注企业级 Agent 中台、AI 网关与业务 AI 产品。</p>
             </div>
             <span className="hero-coordinate">30.2741° N / 120.1551° E</span>
             <Curtains className="hero-curtains" />
           </div>
         </section>
 
-        <div className="light-page">
-          <section className="selected-works" id="work">
-            <div className="grid-container">
-              <div className="section-spacer"><i /></div>
-              <div className="section-header" data-reveal>
-                <i className="dot" />
-                <h2>Selected works</h2>
-                <span>{projects.length}</span>
+        <div className="resume-page">
+          <section className="profile-section grid-container" id="profile">
+            <SectionHeading index="01" title="基本信息" />
+            <div className="profile-grid">
+              <div data-reveal>
+                <span>姓 名</span>
+                <strong>{profile.name}</strong>
               </div>
-              <div className="portfolio-grid">
-                {projects.map((project) => (
-                  <a
-                    className={`portfolio-item ${project.featured ? 'is-wide' : ''}`}
-                    href="#impact-track"
-                    key={project.id}
-                    aria-label={`查看 ${project.title} 项目成果`}
-                  >
-                    <div>
-                      <img
-                        src={asset(project.image)}
-                        alt={`${project.title}产品界面`}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                    <span>{project.title}</span>
-                    <small>{project.result}</small>
-                  </a>
-                ))}
+              <div data-reveal>
+                <span>电 话</span>
+                <a href={`tel:${profile.phone}`}>{profile.phone}</a>
               </div>
-              <div className="section-tail">
-                <a href="#impact-track"><DotLink>View project outcomes</DotLink></a>
+              <div data-reveal>
+                <span>邮 箱</span>
+                <a href={`mailto:${profile.email}`}>{profile.email}</a>
               </div>
+            </div>
+
+            <SectionHeading index="02" title="教育背景" />
+            <div className="education-row" data-reveal>
+              <time>{education.time}</time>
+              <strong>{education.school}</strong>
+              <span>{education.major}</span>
             </div>
           </section>
 
-          <section className="intro-section">
-            <div className="grid-container">
-              <div className="intro-grid">
-                <div data-reveal>
-                  <h2>
-                    我把产品判断、系统设计和快速构建，放在同一条链路里。
-                  </h2>
-                </div>
-                <div data-reveal>
-                  <p>
-                    我的工作横跨 Agent 平台、AI 网关、模型训练工具和业务 AI 产品。先找到值得解决的问题，再决定应该自研、复用还是用代码快速验证。
-                  </p>
-                  <a href="#about"><DotLink>About my experience</DotLink></a>
-                </div>
-              </div>
-
-              <div className="capability-grid" id="capabilities">
-                {capabilities.map((capability) => (
-                  <article className="capability-card" key={capability.number}>
-                    <span>{capability.number}</span>
-                    <div>
-                      <h3>{capability.title}</h3>
-                      <p>{capability.description}</p>
-                    </div>
-                    <ul>
-                      {capability.items.map((item) => (
-                        <li key={item}>
-                          <span>{item}</span>
-                          <i aria-hidden="true" />
-                        </li>
-                      ))}
-                    </ul>
-                  </article>
-                ))}
-              </div>
-              <div className="section-spacer bottom"><i /></div>
-            </div>
-          </section>
-        </div>
-
-        <section className="impact-track" id="impact-track">
-          <div className="impact-stage">
-            <Suspense fallback={null}>
-              <HeroScene mode="impact" triggerId="impact-track" />
-            </Suspense>
-            <Curtains className="impact-start-curtains" />
-            <div className="impact-copy">
-              <span>AI PRODUCT SYSTEMS</span>
-              <h2>结果不是功能清单。<br />结果是系统真的进入业务。</h2>
-              <p>从中台复用、流量治理到具体工作流，我用可量化结果判断产品是否成立。</p>
-            </div>
-            <div className="impact-metrics">
-              <h3>Selected outcomes</h3>
-              {metrics.map((metric) => (
-                <div key={metric.label}>
-                  <span>{metric.label}</span>
-                  <strong>{metric.value}</strong>
-                </div>
+          <section className="advantages-section grid-container">
+            <SectionHeading index="03" title="个人优势" id="advantages" />
+            <div className="advantages-list">
+              {advantages.map((advantage, index) => (
+                <article key={advantage.title} data-reveal>
+                  <span>0{index + 1}</span>
+                  <h3>{advantage.title}</h3>
+                  <p>{advantage.text}</p>
+                </article>
               ))}
-              <a href="#showreel"><DotLink>See product evidence</DotLink></a>
-            </div>
-            <Curtains className="impact-end-curtains" />
-          </div>
-        </section>
-
-        <div className="light-page evidence-page">
-          <section className="principles-section">
-            <div className="grid-container">
-              <div className="section-spacer"><i /></div>
-              <div className="section-header" data-reveal>
-                <i className="dot" />
-                <h2>The decisions behind the results</h2>
-              </div>
-              <div className="principles-grid">
-                {principles.map((principle) => (
-                  <article key={principle.index} data-reveal>
-                    <div>
-                      <span>{principle.index}</span>
-                      <span>● ● ● ● ●</span>
-                    </div>
-                    <blockquote>
-                      <b>“</b>
-                      <h3>{principle.title}</h3>
-                      <p>{principle.text}<i /></p>
-                    </blockquote>
-                    <footer>
-                      <span>ZHANG ZIJIAN</span>
-                      <small>{principle.label}</small>
-                    </footer>
-                  </article>
-                ))}
-              </div>
-              <div className="section-spacer bottom"><i /></div>
             </div>
           </section>
 
-          <section className="showreel-track" id="showreel">
-            <div className="showreel-stage grid-container">
-              <div className="showreel-wrap">
-                <div className="showreel-padding">
-                  <div className="showreel-media">
-                    {projects.slice(0, 4).map((project, index) => (
-                      <img
-                        style={{ '--delay': `${index * 3.2}s` } as React.CSSProperties}
-                        src={asset(project.image)}
-                        alt=""
-                        key={project.id}
-                        loading="lazy"
-                      />
-                    ))}
-                    <span>PRODUCT SYSTEMS / 2023—2026</span>
+          <section className="career-section" id="experience">
+            {experiences.map((experience, experienceIndex) => (
+              <article
+                className={`experience-block ${experienceIndex === 0 ? 'is-primary' : ''}`}
+                key={`${experience.section}-${experience.company}`}
+              >
+                <div className="grid-container">
+                  <SectionHeading
+                    index={`0${experienceIndex + 4}`}
+                    title={experience.section}
+                  />
+                  <div className="experience-layout">
+                    <aside className="experience-meta">
+                      <time>{experience.time}</time>
+                      <h3>{experience.company}</h3>
+                      <strong>{experience.role}</strong>
+                      <span>0{experienceIndex + 1} / 03</span>
+                    </aside>
+                    <div className="experience-detail">
+                      {experience.bullets.map((bullet, index) => (
+                        <section className="resume-bullet" key={`${bullet.title ?? 'intro'}-${index}`} data-reveal>
+                          <span className="bullet-index">{String(index + 1).padStart(2, '0')}</span>
+                          <ResumeBulletContent bullet={bullet} />
+                        </section>
+                      ))}
+
+                      {experience.missingMedia && (
+                        <section className="missing-media" data-reveal>
+                          <div>
+                            <span>MATERIALS NEEDED</span>
+                            <h4>此段经历的图片待补充</h4>
+                          </div>
+                          <ul>
+                            {experience.missingMedia.map((item) => <li key={item}>{item}</li>)}
+                          </ul>
+                        </section>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="experience-section" id="about">
-            <div className="grid-container">
-              <div className="section-header" data-reveal>
-                <i className="dot" />
-                <h2>Experience</h2>
-              </div>
-              <div className="experience-cards">
-                {experiences.map((experience, index) => (
-                  <article key={experience.time} data-reveal>
-                    <div className="experience-image">
-                      <img
-                        src={asset(experienceImages[index])}
-                        alt=""
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="experience-body">
-                      <time>{experience.time}</time>
-                      <div><span>{experience.code}</span></div>
-                      <h3>{experience.role}</h3>
-                      <h4>{experience.company}</h4>
-                      <p>{experience.summary}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
+              </article>
+            ))}
           </section>
         </div>
 
         <section className="contact-section" id="contact">
           <div className="contact-grid">
             <div className="contact-image">
-              <img src={publicAsset('portrait.png')} alt="张子健个人肖像" />
+              <img src={publicAsset('portrait.png')} alt="张子健个人证件照" />
             </div>
             <div className="contact-copy">
-              <span>READY TO START SOMETHING?</span>
-              <h2>有复杂的 AI 产品问题？<br />我们聊聊。</h2>
-              <a href="mailto:1615962561@qq.com">1615962561@qq.com ↗</a>
+              <span>AI PRODUCT MANAGER / HANGZHOU</span>
+              <h2>张子健</h2>
+              <div className="contact-lines">
+                <a href={`tel:${profile.phone}`}>{profile.phone}</a>
+                <a href={`mailto:${profile.email}`}>{profile.email} ↗</a>
+              </div>
+              <p>完整履历已按简历原始顺序呈现。</p>
               <div>
-                <span>HANGZHOU, CHINA</span>
                 <a href="https://github.com/az1615962561-crypto" target="_blank" rel="noreferrer">
                   GITHUB ↗
                 </a>

@@ -15,8 +15,6 @@ const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, v
 
 function startCanvasFallback(
   canvas: HTMLCanvasElement,
-  triggerId: string,
-  mode: 'hero' | 'impact',
   reduceMotion: boolean,
 ) {
   const context = canvas.getContext('2d')
@@ -58,7 +56,7 @@ function startCanvasFallback(
   }
 
   const updateScroll = () => {
-    const trigger = document.getElementById(triggerId)
+    const trigger = document.getElementById('hero-trigger')
     if (!trigger) return
     const rect = trigger.getBoundingClientRect()
     progress = clamp(-rect.top / Math.max(1, trigger.offsetHeight - window.innerHeight))
@@ -88,17 +86,14 @@ function startCanvasFallback(
       const separation = progress * point.size * 22
       const x = centerX + rotatedX * (radius + separation) * scale
       const y = centerY + point.y * (radius + separation) * scale
-      context.globalAlpha = (0.18 + scale * 0.34) * (mode === 'impact' ? 0.9 : 1)
+      context.globalAlpha = 0.18 + scale * 0.34
       context.fillStyle = '#f5f5f2'
       context.beginPath()
       context.arc(x, y, Math.max(0.45, point.size * scale), 0, Math.PI * 2)
       context.fill()
     })
 
-    const cardVisibility =
-      mode === 'impact'
-        ? clamp((progress - 0.05) / 0.18) * clamp((0.96 - progress) / 0.15)
-        : 1 - progress * 0.82
+    const cardVisibility = 1 - progress * 0.82
     const cardCount = isMobile ? 6 : 12
 
     for (let index = 0; index < cardCount; index += 1) {
@@ -154,12 +149,7 @@ function startCanvasFallback(
   }
 }
 
-type HeroSceneProps = {
-  mode?: 'hero' | 'impact'
-  triggerId?: string
-}
-
-export function HeroScene({ mode = 'hero', triggerId = 'hero-trigger' }: HeroSceneProps) {
+export function HeroScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -172,7 +162,7 @@ export function HeroScene({ mode = 'hero', triggerId = 'hero-trigger' }: HeroSce
     const supportsWebGL = Boolean(probe.getContext('webgl2') || probe.getContext('webgl'))
 
     if (!supportsWebGL) {
-      return startCanvasFallback(canvas, triggerId, mode, reduceMotion)
+      return startCanvasFallback(canvas, reduceMotion)
     }
 
     let renderer: THREE.WebGLRenderer
@@ -184,7 +174,7 @@ export function HeroScene({ mode = 'hero', triggerId = 'hero-trigger' }: HeroSce
         powerPreference: 'high-performance',
       })
     } catch {
-      return startCanvasFallback(canvas, triggerId, mode, reduceMotion)
+      return startCanvasFallback(canvas, reduceMotion)
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.6))
     renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -332,7 +322,7 @@ export function HeroScene({ mode = 'hero', triggerId = 'hero-trigger' }: HeroSce
     }
 
     const updateScroll = () => {
-      const trigger = document.getElementById(triggerId)
+      const trigger = document.getElementById('hero-trigger')
       if (!trigger) return
 
       const rect = trigger.getBoundingClientRect()
@@ -357,8 +347,7 @@ export function HeroScene({ mode = 'hero', triggerId = 'hero-trigger' }: HeroSce
       smoothPointer.lerp(pointer, 0.045)
       scrollVelocity *= 0.91
       particleMaterial.uniforms.uTime.value = time
-      particleMaterial.uniforms.uProgress.value =
-        mode === 'impact' ? 0.2 + easedProgress * 0.72 : easedProgress
+      particleMaterial.uniforms.uProgress.value = easedProgress
 
       particleSphere.rotation.y = time * 0.035 + scrollProgress * 1.9 + scrollVelocity * 0.00035
       particleSphere.rotation.x = smoothPointer.y * 0.12 + Math.sin(time * 0.16) * 0.04
@@ -367,30 +356,26 @@ export function HeroScene({ mode = 'hero', triggerId = 'hero-trigger' }: HeroSce
 
       panelGroup.rotation.y = -time * 0.022 - scrollProgress * 2.2 + scrollVelocity * 0.00022
       panelGroup.rotation.x = smoothPointer.y * 0.08 + scrollProgress * 0.18
-      panelGroup.position.z = scrollProgress * (mode === 'impact' ? 2.1 : 1.4)
+      panelGroup.position.z = scrollProgress * 1.4
 
       panels.forEach((panel, index) => {
         panel.lookAt(camera.position)
         panel.getWorldPosition(panelWorldPosition)
         const facing = clamp((panelWorldPosition.z + 3.8) / 7.6)
         const reveal = clamp((time - 0.45 - index * 0.035) / 0.55)
-        const scrollVisibility =
-          mode === 'impact'
-            ? clamp((scrollProgress - 0.06) / 0.16) * clamp((0.96 - scrollProgress) / 0.14)
-            : 1 - scrollProgress * 0.78
+        const scrollVisibility = 1 - scrollProgress * 0.78
         panel.material.opacity = reveal * (0.1 + facing * 0.78) * scrollVisibility
         const breathing = 1 + Math.sin(time * 0.65 + panel.userData.phase) * 0.035
         const scale =
           panel.userData.baseScale *
           breathing *
-          (1 + scrollProgress * (mode === 'impact' ? 2.35 : 1.7))
+          (1 + scrollProgress * 1.7)
         panel.scale.setScalar(scale)
       })
 
       camera.position.x += (smoothPointer.x * 0.55 - camera.position.x) * 0.045
       camera.position.y += (smoothPointer.y * 0.38 - camera.position.y) * 0.045
-      camera.position.z =
-        mode === 'impact' ? 9.2 - easedProgress * 3.1 : 8.4 - easedProgress * 2.6
+      camera.position.z = 8.4 - easedProgress * 2.6
       camera.lookAt(0, 0, 0)
       renderer.render(scene, camera)
     }
@@ -429,13 +414,7 @@ export function HeroScene({ mode = 'hero', triggerId = 'hero-trigger' }: HeroSce
       textures.forEach((texture) => texture.dispose())
       renderer.dispose()
     }
-  }, [mode, triggerId])
+  }, [])
 
-  return (
-    <canvas
-      className={`hero-scene-canvas hero-scene-canvas--${mode}`}
-      ref={canvasRef}
-      aria-hidden="true"
-    />
-  )
+  return <canvas className="hero-scene-canvas" ref={canvasRef} aria-hidden="true" />
 }

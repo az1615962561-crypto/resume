@@ -1,146 +1,178 @@
-export type ProjectCategory = 'PLATFORM' | 'GOVERNANCE' | 'BUSINESS AI'
-
-export type Project = {
-  id: string
-  index: string
-  category: ProjectCategory
-  title: string
-  subtitle: string
-  image: string
-  result: string
-  description: string
-  tags: string[]
-  featured?: boolean
+export const profile = {
+  name: '张子健',
+  phone: '13853512111',
+  email: '1615962561@qq.com',
 }
 
-export const metrics = [
-  { value: '10亿+', label: '日均 Token 处理量', note: '企业级 AI 网关' },
-  { value: '100+', label: 'Agent 应用沉淀', note: '跨 10+ 业务产线' },
-  { value: '20%', label: '业务平均提效', note: 'AI Studio 工具集' },
-  { value: '3季度', label: '研发投入节省', note: '开源能力融合决策' },
-]
+export const education = {
+  time: '2021-09 ~ 2025-06',
+  school: '杭州师范大学',
+  major: '软件工程（本科）',
+}
 
-export const projects: Project[] = [
+export const advantages = [
   {
-    id: 'eureka-orchestration',
-    index: '01',
-    category: 'PLATFORM',
-    title: '尤里卡 AI Agent 中台',
-    subtitle: '把零散 AI 能力变成公司级生产系统',
-    image: 'eureka-orchestration.png',
-    result: '100+ AGENTS / 10万+ 日调用',
-    description:
-      '从 0 到 1 规划五层产品架构，覆盖模型接入、应用编排、知识库、资源管理、调试发布与企业治理。',
-    tags: ['AGENT', 'WORKFLOW', 'RAG', 'MCP'],
-    featured: true,
+    title: '产品经验',
+    text: '具备 AI Agent 中台、AI 网关系统、大模型训练平台等产品 0-1 落地经验，熟悉企业 AI 中台类产品全生命周期，擅长跨职能协同与上下游推进。',
   },
   {
-    id: 'gateway-observability',
-    index: '02',
-    category: 'GOVERNANCE',
-    title: 'AI 网关观测中心',
-    subtitle: '让稳定性、容量、安全与成本可被管理',
-    image: 'gateway-observability.png',
-    result: '10亿+ TOKEN / DAY',
-    description:
-      '用统一观测视角承接多模型、多团队和多业务流量，让异常、容量和成本从黑盒变成决策依据。',
-    tags: ['OBSERVABILITY', 'CAPACITY', 'COST'],
+    title: 'AI能力',
+    text: '掌握 AI Agent 中台规划与 Agent 编排方法论，熟悉 LLM 技术体系，对机器学习与深度学习底层原理具备系统认知，持续跟踪 Agent 行业前沿。',
   },
   {
-    id: 'gateway-models',
-    index: '03',
-    category: 'GOVERNANCE',
-    title: '模型出口网关',
-    subtitle: '统一模型、凭证、授权与调用策略',
-    image: 'gateway-models.png',
-    result: '4-LAYER GATEWAY',
-    description:
-      '围绕子网关、出口、观测与入口四层治理模型，解决 Key 管理、路由、数据安全和用量核算。',
-    tags: ['MODEL ROUTING', 'KEY', 'SECURITY'],
+    title: '工具能力',
+    text: '熟练 Axure、Figma、墨刀等原型工具；熟悉 CC、Codex 等 coder 工具，能以 Vibe Coding 方式独立搭建 MVP 原型并跑通上线；熟悉 SQL、Tableau 搭建数据看板；掌握 VUE、微信小程序、MySQL 等开发技术，与技术沟通理解成本低。',
   },
   {
-    id: 'ai-studio',
-    index: '04',
-    category: 'BUSINESS AI',
-    title: 'Eureka AI Studio',
-    subtitle: '从中台原子能力到业务可用工具',
-    image: 'ai-studio-home.png',
-    result: '3 条产品线完成 AI 化',
-    description:
-      '将 Agent、模型与知识能力包装成业务人员可直接使用的工作台，用更短反馈链验证业务价值。',
-    tags: ['VIBE CODING', 'MVP', 'AI TOOL'],
-    featured: true,
-  },
-  {
-    id: 'media-analysis',
-    index: '05',
-    category: 'BUSINESS AI',
-    title: '投流素材效果分析',
-    subtitle: '把视频素材判断拆成可执行工作流',
-    image: 'ai-studio-media.png',
-    result: '平均效率提升 20%',
-    description:
-      '支持素材导入、规则配置和结构化分析，减少运营人员在重复观看、摘录与横向比较上的时间。',
-    tags: ['MULTIMODAL', 'ANALYSIS', 'OPS'],
-  },
-  {
-    id: 'script-analysis',
-    index: '06',
-    category: 'BUSINESS AI',
-    title: '短视频脚本复刻',
-    subtitle: '把爆款拆解能力产品化',
-    image: 'ai-studio-script.png',
-    result: 'IDEA → WORKING MVP',
-    description:
-      '从业务问题、提示词结构到可编辑结果页，以 Vibe Coding 快速完成原型和可用版本的闭环。',
-    tags: ['PROMPT', 'CONTENT', 'PROTOTYPE'],
+    title: 'Owner 意识 & 抗压能力',
+    text: '具备创业合伙人经历，曾合伙操盘运动科技产品从 0 到 1（选品、获客、运营、分润全链路），对业务目标与结果直接负责；习惯在资源有限、节奏高压的环境下快速决策、扛住不确定性并持续交付，敢于提出并坚持自身判断，可控推进细节落地与跨方沟通。',
   },
 ]
 
-export const capabilities = [
-  {
-    number: '01',
-    title: 'Product',
-    cn: '产品判断',
-    description: '把模糊的业务诉求拆成用户、场景、约束与可验证指标。',
-    items: ['0—1 产品规划', '业务流程重构', '需求优先级与取舍', '增长与商业化'],
-  },
-  {
-    number: '02',
-    title: 'Systems',
-    cn: '系统设计',
-    description: '在模型能力、工程成本和企业治理之间建立可演进的产品结构。',
-    items: ['Agent / Workflow', 'AI Gateway', 'RAG / MCP / Memory', '模型训练与评估平台'],
-  },
-  {
-    number: '03',
-    title: 'Build',
-    cn: '快速构建',
-    description: '用原型与代码缩短讨论周期，让关键假设尽早进入真实反馈。',
-    items: ['Vibe Coding', 'React / Vue', 'Figma / Axure', 'SQL / 数据分析'],
-  },
-]
+export type ResumeBullet = {
+  title?: string
+  text: string
+  subItems?: string[]
+  media?: Array<{
+    file: string
+    sourceName: string
+    alt: string
+  }>
+}
 
-export const experiences = [
+export type ResumeExperience = {
+  section: string
+  time: string
+  company: string
+  role: string
+  bullets: ResumeBullet[]
+  missingMedia?: string[]
+}
+
+export const experiences: ResumeExperience[] = [
   {
-    time: '2025.06 — NOW',
-    role: 'AI 产品经理',
+    section: '工作经历',
+    time: '2025-06 ~ 至今',
     company: '乐其集团',
-    summary: '负责企业级 AI Agent 中台、四层 AI 网关与 AI Studio，推动 10+ 业务产线 AI 化。',
-    code: 'AI INFRA / BUSINESS AI',
+    role: 'AI产品经理',
+    bullets: [
+      {
+        text: '从0到1 主导建立企业级 AI Agent 中台「尤里卡」，并主导其两次关键演进——业务转型与架构转型，推动尤里卡从单点能力平台升级为公司级 AI 中台底座。',
+      },
+      {
+        title: '背景',
+        text: '随着企业AI业务需求的爆发，传统大模型开发面临流程碎片化、资产难沉淀及业务落地门槛高等痛点。尤里卡旨在打造一个一站式全链路AI能力管理中台与低代码应用构建平台',
+      },
+      {
+        title: '全链路能力模块规划',
+        text: '覆盖 AI 能力接入、构建、调试、发布、运维全链路产品方案，规划 Agent 编排、Workflow 编排、RAG、MCP、Skill 技能、上下文与记忆管理等核心能力模块，系统性降低业务方 Agent 搭建与各产线 AI 接入门槛',
+        media: [
+          {
+            file: 'eureka-orchestration.png',
+            sourceName: '尤里卡应用编排.png',
+            alt: '尤里卡应用编排产品界面',
+          },
+        ],
+      },
+      {
+        title: 'AI × 业务融合',
+        text: '作为「AI Studio」主导者，以 Vibe Coding 叠加尤里卡原子能力快速搭建业务开箱即用AI工具，落地短视频脚本检测、投流素材分析、脚本复刻等多套业务工具，平均为业务人员提高20%效率；并推动成熟Studio落到业务型产品，推动3条业务性产品向「业务 + AI」转型，显著提高业务需求响应速度。',
+        media: [
+          {
+            file: 'ai-studio-home.png',
+            sourceName: 'AIstudio页面.png',
+            alt: 'AI Studio 产品首页',
+          },
+          {
+            file: 'ai-studio-media.png',
+            sourceName: 'AIstudio-投流素材分析.png',
+            alt: '投流素材分析产品界面',
+          },
+          {
+            file: 'ai-studio-script.png',
+            sourceName: 'AIstuido-短视频脚本分析.png',
+            alt: '短视频脚本分析产品界面',
+          },
+        ],
+      },
+      {
+        title: '5 层架构方法论沉淀',
+        text: '定义尤里卡「应用层 / 模型层 / 编排层 / 资源层 / 网关层」5 层产品架构，推动各层产品分阶段落地，构建公司 AI 中台资源底座，使公司级 AI 架构可沉淀、可管理、可观测并分发 AI 资源。',
+      },
+      {
+        title: '引入Dify融合编排层',
+        text: '调研开源 Agent 编排框架后，主导引入Dify 与尤里卡编排层融合，复用其编排能力体系，加速编排层标准化能力迭代、沉淀可视化编排能力；直接节省约3个季度开发人力，并释放后续相关功能开发资源。',
+      },
+      {
+        title: '网关层 • AI 网关系统',
+        text: '主导网关层「子网关、出口网关、观测网关、入口网关」四层 AI 网关架构划分，统一管控公司全部 AI 流量的出入、调度与观测，日均处理Token 10亿+。解决各业务线分散接入、API Key 管理分散、算力调度难、Token 成本失控与数据泄露等治理痛点。',
+        media: [
+          {
+            file: 'gateway-observability.png',
+            sourceName: '入口网关.png',
+            alt: 'AI 入口网关产品界面',
+          },
+          {
+            file: 'gateway-models.png',
+            sourceName: '出口网关.png',
+            alt: 'AI 出口网关产品界面',
+          },
+        ],
+      },
+      {
+        title: '业务赋能验证',
+        text: '已赋能阿宝坐席客服、Ucoach 等 10+AI 产线，并沉淀100+Agent应用库；平台日调用量10w+。',
+      },
+    ],
   },
   {
-    time: '2024.10 — 2025.03',
-    role: 'AI 产品经理',
-    company: '杭州谐云科技有限公司',
-    summary: '参与数据标注、算力调度、模型训练与评估平台，跨算法和工程团队推进交付。',
-    code: 'MLOPS / PLATFORM',
-  },
-  {
-    time: '2023.10 — 2024.05',
-    role: '合伙人',
+    section: '创业经历',
+    time: '2023-10 ~ 2024-05',
     company: '苏州轻练健康科技有限公司',
-    summary: '从产品、获客到运营参与运动科技业务 0—1，月营收 10 万，毛利率 32%。',
-    code: '0—1 / GROWTH',
+    role: '合伙人',
+    bullets: [
+      {
+        title: '0-1产品规划与市场匹配',
+        text: '通过海外众筹平台及竞品分析，主导运动科技产品本土化改造，精准匹配国内用户对高性价比、沉浸式体验的需求，月流水达10w，利润率达32%，首月转化率达80%。',
+      },
+      {
+        title: '用户增长与运营优化',
+        text: '',
+        subItems: [
+          '1.搭建标准化门店SOE，基于25-35岁女性用户画像设计获客方案，单店日均获客量提升200%。',
+          '2.打造沉浸用户体验场景，优化用户留存策略，推动月活跃用户（MAU）环比增长45%。',
+        ],
+      },
+      {
+        title: '行业痛点解决',
+        text: '针对运动时间碎片化、教练管理低效等问题，降低运营成本30%',
+      },
+    ],
+    missingMedia: ['运动科技产品图', '线下门店或沉浸式体验场景图', '运营或增长数据截图'],
+  },
+  {
+    section: '实习经历',
+    time: '2024-10 ~ 2025-03',
+    company: '杭州谐云科技有限公司',
+    role: 'AI产品经理',
+    bullets: [
+      {
+        title: '数据采集与标注',
+        text: '参与模型训练数据集设计，选取文本标注分割策略；支持文本、图片、视频分类标签化标注，采取逐帧策略简化视频标注，缩短标注时间30%。',
+      },
+      {
+        title: '算力平台设计',
+        text: '参与完成算力平台设计，实现集群、节点、资源池三层算力架构划分，同时设立角色、租户分级管理；并基于MIG虚拟化方案优化算力架构功能点。使得算力调度可观测程度大大提高，充分利用分配算力资源。',
+      },
+      {
+        title: '模型评估',
+        text: '参与模型评估模块的设计，支持自定义上传模型库模型、测试数据集、测试镜像进行评测打分。',
+      },
+      {
+        title: '跨团队写作与产品优化',
+        text: '协调重庆数智与总部技术团队，推动重庆数智平台的按时上线。通过Scrum敏捷方法管理项目进度，基于用户反馈进行功能迭代优化，重点改善了模型在线测试，最终使算法工程师操作效率提高30%，客户满意度提升。',
+      },
+    ],
+    missingMedia: ['数据采集与标注平台截图', '算力平台截图', '模型评估或模型在线测试截图'],
   },
 ]

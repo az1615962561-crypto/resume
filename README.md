@@ -1,6 +1,6 @@
-# 张子健个人网站 Demo
+# 张子健个人履历网站
 
-AI 产品经理个人作品集 Demo，重点展示 Agent 平台、AI 基础设施、业务结果与 Vibe Coding 能力。
+AI 产品经理个人履历网站。首屏展示 Agent 平台与 AI 基础设施视觉，正文严格按照简历的基本信息、教育背景、个人优势、工作经历、创业经历和实习经历顺序展开。
 
 ## 本地运行
 
@@ -35,9 +35,9 @@ npm run build
 
 ## 内容维护
 
-- `src/content.ts`：关键数据、项目与经历
+- `src/content.ts`：简历全文、经历结构与素材映射
 - `src/App.tsx`：页面结构与交互内容
-- `src/HeroScene.tsx`：首屏与成果区 Three.js / Canvas 场景
+- `src/HeroScene.tsx`：首屏 Three.js / Canvas 场景
 - `src/assets.ts`：线上与离线单文件的素材地址解析
 - `CONTENT_TODO.md`：后续内容采集模板
 - `public/portrait.png`：当前个人肖像
