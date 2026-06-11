@@ -34,11 +34,11 @@ const inlinedJavaScript = javascript
 html = html
   .replace(
     `<script type="module" crossorigin src="${scriptSrc}"></script>`,
-    `<script type="module">${inlinedJavaScript}</script>`,
+    () => `<script type="module">${inlinedJavaScript}</script>`,
   )
   .replace(
     `<link rel="stylesheet" crossorigin href="${cssHref}">`,
-    `<style>${css}</style>`,
+    () => `<style>${css}</style>`,
   )
 
 const outputPath = join(projectRoot, '打开Demo.html')
