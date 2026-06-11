@@ -6,6 +6,7 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const distDir = join(projectRoot, 'dist')
 const htmlPath = join(distDir, 'index.html')
 const portraitPath = join(distDir, 'portrait.png')
+const faviconPath = join(distDir, 'favicon.svg')
 const projectsDir = join(distDir, 'projects')
 
 let html = await readFile(htmlPath, 'utf8')
@@ -20,10 +21,11 @@ if (!cssHref || !scriptSrc) {
 const resolveAsset = (assetPath) =>
   join(distDir, assetPath.replace(/^\.?\//, ''))
 
-const [css, javascript, portrait, projectNames] = await Promise.all([
+const [css, javascript, portrait, favicon, projectNames] = await Promise.all([
   readFile(resolveAsset(cssHref), 'utf8'),
   readFile(resolveAsset(scriptSrc), 'utf8'),
   readFile(portraitPath),
+  readFile(faviconPath),
   readdir(projectsDir),
 ])
 
@@ -44,6 +46,7 @@ const standaloneAssetScript = `<script>window.__PORTFOLIO_ASSETS__=${JSON.string
 const inlinedJavaScript = javascript.replaceAll('</script>', '<\\/script>')
 
 html = html
+  .replace('./favicon.svg', `data:image/svg+xml;base64,${favicon.toString('base64')}`)
   .replace(
     `<script type="module" crossorigin src="${scriptSrc}"></script>`,
     () => `${standaloneAssetScript}<script type="module">${inlinedJavaScript}</script>`,
