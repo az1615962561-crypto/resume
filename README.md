@@ -37,7 +37,7 @@ npm run build
 
 - `src/content.ts`：关键数据、项目与经历
 - `src/App.tsx`：页面结构与交互内容
+- `src/HeroScene.tsx`：首屏与成果区 Three.js / Canvas 场景
+- `src/assets.ts`：线上与离线单文件的素材地址解析
 - `CONTENT_TODO.md`：后续内容采集模板
 - `public/portrait.png`：当前个人肖像
-
-当前 Vibe Coding Lab 是本地静态交互，尚未连接真实大模型。

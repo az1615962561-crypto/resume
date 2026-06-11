@@ -121,37 +121,6 @@ export const capabilities = [
   },
 ]
 
-export const impactSlides = [
-  {
-    value: '10亿+',
-    label: 'TOKEN / DAY',
-    title: '规模不是一句“支持高并发”',
-    description: '把流量入口、模型出口、观测与子网关拆成四层，才让容量、成本与安全可以分别治理。',
-    image: 'gateway-observability.png',
-  },
-  {
-    value: '100+',
-    label: 'AGENTS IN PRODUCTION',
-    title: '平台价值来自复用，不是功能数量',
-    description: '围绕编排、知识、资源和发布链路沉淀公共能力，让不同产线不必重复建设。',
-    image: 'eureka-orchestration.png',
-  },
-  {
-    value: '20%',
-    label: 'EFFICIENCY LIFT',
-    title: 'AI 最终要进入具体工作流',
-    description: '把模型能力嵌入素材分析与脚本生产，结果由业务人员的真实使用效率来验证。',
-    image: 'ai-studio-media.png',
-  },
-  {
-    value: '3季度',
-    label: 'ENGINEERING SAVED',
-    title: '好的产品决策也包括“不自研”',
-    description: '选择融合成熟开源编排能力，把研发资源留给企业治理、资产沉淀和业务差异化。',
-    image: 'ai-studio-home.png',
-  },
-]
-
 export const experiences = [
   {
     time: '2025.06 — NOW',

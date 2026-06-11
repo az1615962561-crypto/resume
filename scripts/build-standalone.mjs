@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises'
+import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -6,6 +6,7 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const distDir = join(projectRoot, 'dist')
 const htmlPath = join(distDir, 'index.html')
 const portraitPath = join(distDir, 'portrait.png')
+const projectsDir = join(distDir, 'projects')
 
 let html = await readFile(htmlPath, 'utf8')
 
@@ -19,22 +20,33 @@ if (!cssHref || !scriptSrc) {
 const resolveAsset = (assetPath) =>
   join(distDir, assetPath.replace(/^\.?\//, ''))
 
-const [css, javascript, portrait] = await Promise.all([
+const [css, javascript, portrait, projectNames] = await Promise.all([
   readFile(resolveAsset(cssHref), 'utf8'),
   readFile(resolveAsset(scriptSrc), 'utf8'),
   readFile(portraitPath),
+  readdir(projectsDir),
 ])
 
-const portraitDataUrl = `data:image/png;base64,${portrait.toString('base64')}`
-const inlinedJavaScript = javascript
-  .replaceAll('./portrait.png', portraitDataUrl)
-  .replaceAll('/portrait.png', portraitDataUrl)
-  .replaceAll('</script>', '<\\/script>')
+const projectAssets = await Promise.all(
+  projectNames
+    .filter((name) => name.endsWith('.png'))
+    .map(async (name) => ({
+      name,
+      dataUrl: `data:image/png;base64,${(await readFile(join(projectsDir, name))).toString('base64')}`,
+    })),
+)
+
+const standaloneAssets = Object.fromEntries([
+  ['portrait.png', `data:image/png;base64,${portrait.toString('base64')}`],
+  ...projectAssets.map(({ name, dataUrl }) => [name, dataUrl]),
+])
+const standaloneAssetScript = `<script>window.__PORTFOLIO_ASSETS__=${JSON.stringify(standaloneAssets)}</script>`
+const inlinedJavaScript = javascript.replaceAll('</script>', '<\\/script>')
 
 html = html
   .replace(
     `<script type="module" crossorigin src="${scriptSrc}"></script>`,
-    () => `<script type="module">${inlinedJavaScript}</script>`,
+    () => `${standaloneAssetScript}<script type="module">${inlinedJavaScript}</script>`,
   )
   .replace(
     `<link rel="stylesheet" crossorigin href="${cssHref}">`,

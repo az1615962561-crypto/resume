@@ -1,34 +1,114 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import {
-  capabilities,
-  experiences,
-  impactSlides,
-  metrics,
-  projects,
-  type ProjectCategory,
-} from './content'
-import { HeroScene } from './HeroScene'
+import { projectAsset as asset, publicAsset } from './assets'
+import { capabilities, experiences, metrics, projects } from './content'
 import './App.css'
+
+const HeroScene = lazy(() =>
+  import('./HeroScene').then((module) => ({ default: module.HeroScene })),
+)
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const filters: Array<'ALL' | ProjectCategory> = ['ALL', 'PLATFORM', 'GOVERNANCE', 'BUSINESS AI']
-const asset = (name: string) => `${import.meta.env.BASE_URL}projects/${name}`
+const questions = [
+  {
+    question: '你做过最复杂的 AI 产品是什么？',
+    answer:
+      '尤里卡 AI Agent 中台。它覆盖模型接入、应用编排、知识库、资源治理、调试发布与企业级网关，并在 10+ 业务产线中持续复用。',
+  },
+  {
+    question: '你为什么强调 Vibe Coding？',
+    answer:
+      '因为产品判断需要尽快进入真实反馈。Vibe Coding 让我能把流程、Prompt 和交互直接做成可操作版本，而不是停留在 PRD。',
+  },
+  {
+    question: '你如何在自研和开源之间取舍？',
+    answer:
+      '先明确真正形成差异化的部分。编排能力选择融合成熟开源方案，把研发资源留给企业治理、资产沉淀和业务适配。',
+  },
+]
+
+const principles = [
+  {
+    index: '01 / 03',
+    title: '能复用，就不重复建设。',
+    text: '平台价值不来自功能数量，而来自公共能力能否被不同团队反复调用，并持续降低下一次交付成本。',
+    label: 'PLATFORM THINKING',
+  },
+  {
+    index: '02 / 03',
+    title: '先做最短反馈链。',
+    text: '在复杂系统真正投入建设前，先用原型和代码验证用户动作、输入质量与结果是否值得继续放大。',
+    label: 'VIBE CODING',
+  },
+  {
+    index: '03 / 03',
+    title: '规模化之前先可观测。',
+    text: '当 AI 流量变大，容量、成本、安全和质量必须分别看见，否则所谓增长只是更大的黑盒。',
+    label: 'AI GOVERNANCE',
+  },
+]
+
+const experienceImages = [
+  'eureka-orchestration.png',
+  'gateway-observability.png',
+  'ai-studio-home.png',
+]
+
+function DotLink({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <i className="dot" />
+      <span>{children}</span>
+      <b aria-hidden="true">↗</b>
+    </>
+  )
+}
+
+function Curtains({ className = '' }: { className?: string }) {
+  return (
+    <div className={`curtains ${className}`} aria-hidden="true">
+      {Array.from({ length: 6 }, (_, index) => (
+        <i key={index} />
+      ))}
+    </div>
+  )
+}
 
 function App() {
   const root = useRef<HTMLDivElement>(null)
-  const [filter, setFilter] = useState<(typeof filters)[number]>('ALL')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [askOpen, setAskOpen] = useState(false)
+  const [questionIndex, setQuestionIndex] = useState(0)
+
+  useEffect(() => {
+    if (!menuOpen && !askOpen) return
+
+    const previousOverflow = document.body.style.overflow
+    const closePanels = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setMenuOpen(false)
+      setAskOpen(false)
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', closePanels)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closePanels)
+    }
+  }, [askOpen, menuOpen])
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia()
+      const media = gsap.matchMedia()
 
-      mm.add(
+      media.add(
         {
-          desktop: '(min-width: 900px)',
+          desktop: '(min-width: 1024px)',
           reduceMotion: '(prefers-reduced-motion: reduce)',
         },
         (context) => {
@@ -38,35 +118,36 @@ function App() {
           }
 
           if (reduceMotion) {
-            gsap.set('[data-animate], .impact-slide', { clearProps: 'all' })
+            gsap.set('[data-reveal], .hero-copy, .scene-loading', { clearProps: 'all' })
             return
           }
 
           gsap
-            .timeline({ defaults: { ease: 'power3.out' } })
-            .from('.hero-kicker', { autoAlpha: 0, y: 18, duration: 0.6 })
-            .from('.hero-title-line', { yPercent: 115, duration: 1.05, stagger: 0.08 }, '-=.25')
-            .from('.hero-deck, .hero-actions', { autoAlpha: 0, y: 24, duration: 0.7, stagger: 0.1 }, '-=.55')
-            .from('.visual-window', { autoAlpha: 0, scale: 0.86, duration: 1, stagger: 0.12 }, '-=.9')
+            .timeline({ defaults: { duration: 0.65, ease: 'power2.out' } })
+            .from('.site-header', { autoAlpha: 0, y: -18 })
+            .from('.hero-copy > *', { autoAlpha: 0, yPercent: 70, stagger: 0.09 }, '-=.2')
+            .from('.scene-loading', { autoAlpha: 0 }, '<')
 
-          if (desktop) {
-            gsap
-              .timeline({
-                scrollTrigger: {
-                  trigger: '.hero',
-                  start: 'top top',
-                  end: '+=150%',
-                  pin: '.hero-inner',
-                  scrub: 0.8,
-                },
-              })
-              .to('.hero-copy', { yPercent: -18, autoAlpha: 0.08, ease: 'none' }, 0)
-              .to('.signal-orb', { scale: 1.35, rotation: 36, ease: 'none' }, 0)
-              .to('.visual-window-a', { xPercent: -32, yPercent: -18, rotation: -10, ease: 'none' }, 0)
-              .to('.visual-window-b', { xPercent: 26, yPercent: -24, rotation: 8, ease: 'none' }, 0)
-              .to('.visual-window-c', { xPercent: 18, yPercent: 28, rotation: 5, ease: 'none' }, 0)
-              .to('.hero-visual', { scale: 1.08, ease: 'none' }, 0)
-          }
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: '#hero-trigger',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: true,
+              },
+            })
+            .to('.hero-copy', { autoAlpha: 0, yPercent: -35, duration: 0.32 }, 0.34)
+            .to(
+              '.hero-curtains i',
+              {
+                scaleY: 1,
+                duration: 0.3,
+                stagger: { each: 0.035, from: 'start' },
+                ease: 'power2.inOut',
+              },
+              0.68,
+            )
 
           ScrollTrigger.batch('[data-reveal]', {
             start: 'top 88%',
@@ -74,417 +155,410 @@ function App() {
             onEnter: (elements) =>
               gsap.fromTo(
                 elements,
-                { autoAlpha: 0, y: 42 },
-                { autoAlpha: 1, y: 0, duration: 0.85, stagger: 0.08, ease: 'power3.out' },
+                { autoAlpha: 0, y: 44 },
+                {
+                  autoAlpha: 1,
+                  y: 0,
+                  duration: 0.72,
+                  stagger: 0.07,
+                  ease: 'power2.out',
+                },
               ),
           })
 
-          gsap.fromTo(
-            '.manifesto-line',
-            { yPercent: 105 },
-            {
-              yPercent: 0,
-              stagger: 0.08,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: '.manifesto',
-                start: 'top 78%',
-                end: 'bottom 48%',
-                scrub: 0.7,
-              },
-            },
-          )
-
           if (desktop) {
-            const impactTimeline = gsap.timeline({
+            gsap.from('.portfolio-item', {
+              autoAlpha: 0,
+              yPercent: 18,
+              stagger: 0.06,
+              ease: 'power2.out',
               scrollTrigger: {
-                trigger: '.impact',
-                start: 'top top',
-                end: `+=${impactSlides.length * 100}%`,
-                pin: '.impact-stage',
-                scrub: 0.8,
+                trigger: '.portfolio-grid',
+                start: 'top 82%',
+                toggleActions: 'play none none reverse',
               },
             })
 
-            gsap.set('.impact-slide', { autoAlpha: 0 })
-            gsap.set('.impact-slide:first-child', { autoAlpha: 1 })
-
-            impactSlides.forEach((_, index) => {
-              if (index === 0) return
-              impactTimeline
-                .to(`.impact-slide:nth-child(${index})`, { autoAlpha: 0, yPercent: -8, duration: 0.35 })
-                .fromTo(
-                  `.impact-slide:nth-child(${index + 1})`,
-                  { autoAlpha: 0, yPercent: 12 },
-                  { autoAlpha: 1, yPercent: 0, duration: 0.35 },
-                  '<',
-                )
-                .to(
-                  '.impact-image-track',
-                  { yPercent: -index * (100 / impactSlides.length), duration: 0.7, ease: 'power2.inOut' },
-                  '<',
-                )
+            gsap.from('.capability-card > *', {
+              autoAlpha: 0,
+              x: 90,
+              stagger: 0.035,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: '.capability-grid',
+                start: 'top 78%',
+                toggleActions: 'play none none reverse',
+              },
             })
           }
 
-          gsap.fromTo(
-            '.showcase-frame',
-            { width: desktop ? '74%' : '100%', borderRadius: desktop ? 28 : 0 },
-            {
-              width: '100%',
-              borderRadius: 0,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: '.showcase',
-                start: 'top 72%',
-                end: 'center 48%',
-                scrub: 0.7,
-              },
+          const impactTimeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: '#impact-track',
+              start: 'top top',
+              end: 'bottom bottom',
+              scrub: true,
             },
-          )
+          })
+
+          impactTimeline
+            .to(
+              '.impact-start-curtains i',
+              {
+                scaleY: 0,
+                duration: 0.13,
+                stagger: { each: 0.012, from: 'end' },
+                ease: 'none',
+              },
+              0,
+            )
+            .fromTo(
+              '.impact-copy > *',
+              { autoAlpha: 0, yPercent: 90 },
+              { autoAlpha: 1, yPercent: 0, duration: 0.13, stagger: 0.02 },
+              0.1,
+            )
+            .fromTo(
+              '.impact-metrics > *',
+              { autoAlpha: 0, yPercent: 70 },
+              { autoAlpha: 1, yPercent: 0, duration: 0.13, stagger: 0.018 },
+              0.16,
+            )
+            .to('.impact-copy, .impact-metrics', { autoAlpha: 0, duration: 0.08 }, 0.78)
+            .to(
+              '.impact-end-curtains i',
+              {
+                scaleY: 1,
+                duration: 0.13,
+                stagger: { each: 0.012, from: 'start' },
+                ease: 'none',
+              },
+              0.86,
+            )
+
+          if (desktop) {
+            gsap
+              .timeline({
+                scrollTrigger: {
+                  trigger: '.showreel-track',
+                  start: 'top top',
+                  end: 'bottom bottom',
+                  scrub: true,
+                },
+              })
+              .to('.showreel-wrap', { width: '100%', borderWidth: 0, duration: 1 }, 0)
+              .to('.showreel-padding', { padding: 0, borderWidth: 0, duration: 1 }, 0)
+          }
         },
       )
 
-      const refresh = () => {
-        ScrollTrigger.refresh()
-        const target = document.getElementById(window.location.hash.slice(1))
-        target?.scrollIntoView()
-      }
-      let refreshFrame = 0
-
-      if (document.readyState === 'complete') {
-        refreshFrame = window.requestAnimationFrame(refresh)
-      } else {
-        window.addEventListener('load', refresh)
-      }
-
+      const refresh = () => ScrollTrigger.refresh()
+      window.addEventListener('load', refresh)
       return () => {
         window.removeEventListener('load', refresh)
-        window.cancelAnimationFrame(refreshFrame)
-        mm.revert()
+        media.revert()
       }
     },
     { scope: root },
   )
 
-  useEffect(() => {
-    const refreshFrame = window.requestAnimationFrame(() => ScrollTrigger.refresh())
-    return () => window.cancelAnimationFrame(refreshFrame)
-  }, [filter])
-
-  const handlePointer = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const x = (event.clientX - rect.left) / rect.width - 0.5
-    const y = (event.clientY - rect.top) / rect.height - 0.5
-    event.currentTarget.style.setProperty('--mouse-x', `${x * 28}px`)
-    event.currentTarget.style.setProperty('--mouse-y', `${y * 28}px`)
-    event.currentTarget.style.setProperty('--mouse-x-reverse', `${x * -18}px`)
-    event.currentTarget.style.setProperty('--mouse-y-reverse', `${y * -18}px`)
-  }
-
-  const resetPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
-    event.currentTarget.style.setProperty('--mouse-x', '0px')
-    event.currentTarget.style.setProperty('--mouse-y', '0px')
-    event.currentTarget.style.setProperty('--mouse-x-reverse', '0px')
-    event.currentTarget.style.setProperty('--mouse-y-reverse', '0px')
-  }
-
-  const visibleProjects = filter === 'ALL' ? projects : projects.filter((project) => project.category === filter)
-
   return (
     <div className="site-shell" ref={root}>
       <header className="site-header">
         <a className="wordmark" href="#top" aria-label="返回首页">
-          ZZ<span>®</span>
+          ZHANG
+          <span>• ZIJIAN</span>
         </a>
-        <nav aria-label="主导航">
-          <a href="#work">Works</a>
-          <a href="#capabilities">Capabilities</a>
-          <a href="#about">About</a>
-        </nav>
-        <a className="header-cta" href="#contact">
-          <span className="header-cta-long">Start a conversation</span>
-          <span className="header-cta-short">Contact</span>
-          <i>↗</i>
-        </a>
+        <button
+          aria-controls="ask-panel"
+          aria-expanded={askOpen}
+          className="ask-trigger"
+          type="button"
+          onClick={() => setAskOpen(true)}
+        >
+          <span>Ask about my work</span>
+          <i>⌁</i>
+        </button>
+        <button
+          aria-controls="menu-panel"
+          aria-expanded={menuOpen}
+          className="menu-trigger"
+          type="button"
+          onClick={() => setMenuOpen(true)}
+        >
+          <span>＋</span> MENU
+        </button>
       </header>
 
-      <main>
-        <section className="hero" id="top">
-          <div className="hero-inner">
-            <div className="hero-copy">
-              <p className="hero-kicker">AI PRODUCT MANAGER / VIBE CODER / HANGZHOU</p>
-              <h1>
-                <span className="line-mask">
-                  <span className="hero-title-line">把复杂 AI，</span>
-                </span>
-                <span className="line-mask">
-                  <span className="hero-title-line">做成<span className="accent-word">可用产品</span>。</span>
-                </span>
-              </h1>
-              <p className="hero-deck">
-                我是张子健。我在产品、AI 系统与代码之间工作，把不清晰的业务问题推进到可运行、可衡量、可复用。
-              </p>
-              <div className="hero-actions">
-                <a href="#work">Selected work <span>↓</span></a>
-                <a href="mailto:1615962561@qq.com">Email me <span>↗</span></a>
-              </div>
-            </div>
+      <div
+        aria-hidden={!menuOpen}
+        aria-label="网站导航"
+        aria-modal="true"
+        className={`menu-panel ${menuOpen ? 'is-open' : ''}`}
+        id="menu-panel"
+        role="dialog"
+      >
+        <button type="button" onClick={() => setMenuOpen(false)}>CLOSE ×</button>
+        <nav>
+          <a href="#work" onClick={() => setMenuOpen(false)}>Selected work</a>
+          <a href="#capabilities" onClick={() => setMenuOpen(false)}>Capabilities</a>
+          <a href="#about" onClick={() => setMenuOpen(false)}>Experience</a>
+          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
+        </nav>
+        <div>
+          <span>AI PRODUCT / HANGZHOU</span>
+          <span>NEVER STOP BUILDING™</span>
+        </div>
+      </div>
 
-            <div
-              className="hero-visual"
-              onPointerMove={handlePointer}
-              onPointerLeave={resetPointer}
-              aria-label="由真实项目界面组成的交互式 AI 产品系统视觉"
+      <div
+        aria-hidden={!askOpen}
+        aria-label="关于张子健的工作问答"
+        aria-modal="true"
+        className={`ask-panel ${askOpen ? 'is-open' : ''}`}
+        id="ask-panel"
+        role="dialog"
+      >
+        <div className="ask-panel-bar">
+          <span>ASK_ZIJIAN.AI / LOCAL PROFILE</span>
+          <button type="button" onClick={() => setAskOpen(false)}>CLOSE ×</button>
+        </div>
+        <div className="ask-answer">
+          <span>ANSWER / 0{questionIndex + 1}</span>
+          <p>{questions[questionIndex].answer}</p>
+        </div>
+        <div className="ask-questions">
+          {questions.map((item, index) => (
+            <button
+              className={questionIndex === index ? 'is-active' : ''}
+              key={item.question}
+              onClick={() => setQuestionIndex(index)}
+              type="button"
             >
+              <span>{item.question}</span><i>↗</i>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <main>
+        <section className="hero-trigger" id="hero-trigger">
+          <div className="hero-stage" id="top">
+            <Suspense fallback={<div className="scene-loading">LOADING SCENE</div>}>
               <HeroScene />
-              <div className="hero-grid" />
-              <figure className="visual-window visual-window-a">
-                <img src={asset('eureka-orchestration.png')} alt="" decoding="async" fetchPriority="high" />
-                <figcaption>AGENT ORCHESTRATION</figcaption>
-              </figure>
-              <figure className="visual-window visual-window-b">
-                <img src={asset('gateway-observability.png')} alt="" decoding="async" fetchPriority="high" />
-                <figcaption>AI GATEWAY</figcaption>
-              </figure>
-              <figure className="visual-window visual-window-c">
-                <img src={asset('ai-studio-script.png')} alt="" decoding="async" fetchPriority="high" />
-                <figcaption>BUSINESS AI</figcaption>
-              </figure>
-              <div className="signal-orb">
-                <span>PRODUCT</span>
-                <strong>× AI</strong>
-                <small>BUILD / TEST / LEARN</small>
-              </div>
-              <div className="hero-visual-label">
-                <span>LIVE SYSTEM / 001</span>
-                <span>MOVE POINTER</span>
-              </div>
+            </Suspense>
+            <div className="hero-copy">
+              <h1>AI 产品经理，专注把复杂模型能力变成可用、可治理、可增长的产品。</h1>
+              <p>NEVER STOP BUILDING™</p>
             </div>
-
-            <div className="hero-foot">
-              <span>AVAILABLE FOR AI PRODUCT OPPORTUNITIES</span>
-              <span>SCROLL TO EXPLORE</span>
-            </div>
+            <span className="hero-coordinate">30.2741° N / 120.1551° E</span>
+            <Curtains className="hero-curtains" />
           </div>
         </section>
 
-        <section className="proof-strip" aria-label="关键项目成果">
-          <p>REAL SYSTEMS.<br />MEASURABLE OUTCOMES.</p>
-          <div>
-            {metrics.map((metric) => (
-              <article key={metric.label}>
-                <strong>{metric.value}</strong>
-                <span>{metric.label}</span>
-                <small>{metric.note}</small>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="manifesto">
-          <p className="section-code">01 / POINT OF VIEW</p>
-          <div className="manifesto-copy">
-            <div className="line-mask"><span className="manifesto-line">简历说明我做过什么。</span></div>
-            <div className="line-mask"><span className="manifesto-line">作品说明我如何判断。</span></div>
-            <div className="line-mask"><span className="manifesto-line accent-line">代码证明我能把它做出来。</span></div>
-          </div>
-        </section>
-
-        <section className="works" id="work">
-          <div className="section-intro" data-reveal>
-            <p className="section-code">02 / SELECTED WORKS / 2023—2026</p>
-            <h2>真实项目，而不是概念包装。</h2>
-            <p>从 AI 基础设施到业务工具，每个案例都用界面、决策和结果共同说明。</p>
-          </div>
-
-          <div className="project-filters" data-reveal aria-label="筛选项目">
-            {filters.map((item) => (
-              <button
-                className={filter === item ? 'is-active' : ''}
-                key={item}
-                onClick={() => setFilter(item)}
-                type="button"
-                aria-pressed={filter === item}
-              >
-                {item}
-                <span>{item === 'ALL' ? projects.length : projects.filter((project) => project.category === item).length}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="project-grid">
-            {visibleProjects.map((project) => (
-              <article
-                className={`project-card ${project.featured ? 'is-featured' : ''}`}
-                key={project.id}
-                data-reveal
-              >
-                <div className="project-image">
-                  <img
-                    src={asset(project.image)}
-                    alt={`${project.title}产品界面`}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div className="project-image-meta">
-                    <span>{project.index}</span>
-                    <span>{project.category}</span>
-                  </div>
-                </div>
-                <div className="project-copy">
-                  <div>
-                    <p>{project.subtitle}</p>
-                    <h3>{project.title}</h3>
-                  </div>
-                  <p className="project-description">{project.description}</p>
-                  <div className="project-result">
-                    <strong>{project.result}</strong>
-                    <span>PROJECT EVIDENCE</span>
-                  </div>
-                  <ul>
-                    {project.tags.map((tag) => <li key={tag}>{tag}</li>)}
-                  </ul>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="capabilities" id="capabilities">
-          <div className="section-intro" data-reveal>
-            <p className="section-code">03 / HOW I WORK</p>
-            <h2>Product. Systems. Build.</h2>
-            <p>不是三个分开的技能，而是一条从问题到验证的完整链路。</p>
-          </div>
-          <div className="capability-grid">
-            {capabilities.map((capability) => (
-              <article key={capability.number} data-reveal>
-                <span>{capability.number}</span>
-                <div>
-                  <p>{capability.cn}</p>
-                  <h3>{capability.title}</h3>
-                </div>
-                <p>{capability.description}</p>
-                <ul>
-                  {capability.items.map((item) => <li key={item}>{item}</li>)}
-                </ul>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="impact">
-          <div className="impact-stage">
-            <div className="impact-copy">
-              <p className="section-code">04 / IMPACT, NOT OUTPUT</p>
-              <div className="impact-slides">
-                {impactSlides.map((slide) => (
-                  <article className="impact-slide" key={slide.value}>
-                    <div className="impact-value">
-                      <strong>{slide.value}</strong>
-                      <span>{slide.label}</span>
+        <div className="light-page">
+          <section className="selected-works" id="work">
+            <div className="grid-container">
+              <div className="section-spacer"><i /></div>
+              <div className="section-header" data-reveal>
+                <i className="dot" />
+                <h2>Selected works</h2>
+                <span>{projects.length}</span>
+              </div>
+              <div className="portfolio-grid">
+                {projects.map((project) => (
+                  <a
+                    className={`portfolio-item ${project.featured ? 'is-wide' : ''}`}
+                    href="#impact-track"
+                    key={project.id}
+                    aria-label={`查看 ${project.title} 项目成果`}
+                  >
+                    <div>
+                      <img
+                        src={asset(project.image)}
+                        alt={`${project.title}产品界面`}
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
-                    <h2>{slide.title}</h2>
-                    <p>{slide.description}</p>
+                    <span>{project.title}</span>
+                    <small>{project.result}</small>
+                  </a>
+                ))}
+              </div>
+              <div className="section-tail">
+                <a href="#impact-track"><DotLink>View project outcomes</DotLink></a>
+              </div>
+            </div>
+          </section>
+
+          <section className="intro-section">
+            <div className="grid-container">
+              <div className="intro-grid">
+                <div data-reveal>
+                  <h2>
+                    我把产品判断、系统设计和快速构建，放在同一条链路里。
+                  </h2>
+                </div>
+                <div data-reveal>
+                  <p>
+                    我的工作横跨 Agent 平台、AI 网关、模型训练工具和业务 AI 产品。先找到值得解决的问题，再决定应该自研、复用还是用代码快速验证。
+                  </p>
+                  <a href="#about"><DotLink>About my experience</DotLink></a>
+                </div>
+              </div>
+
+              <div className="capability-grid" id="capabilities">
+                {capabilities.map((capability) => (
+                  <article className="capability-card" key={capability.number}>
+                    <span>{capability.number}</span>
+                    <div>
+                      <h3>{capability.title}</h3>
+                      <p>{capability.description}</p>
+                    </div>
+                    <ul>
+                      {capability.items.map((item) => (
+                        <li key={item}>
+                          <span>{item}</span>
+                          <i aria-hidden="true" />
+                        </li>
+                      ))}
+                    </ul>
                   </article>
                 ))}
               </div>
-              <div className="impact-progress">
-                <span>01</span><i /><span>04</span>
-              </div>
+              <div className="section-spacer bottom"><i /></div>
             </div>
-            <div className="impact-media">
-              <div className="impact-image-track">
-                {impactSlides.map((slide) => (
-                  <figure key={slide.image}>
-                    <img src={asset(slide.image)} alt="" loading="lazy" decoding="async" />
-                  </figure>
+          </section>
+        </div>
+
+        <section className="impact-track" id="impact-track">
+          <div className="impact-stage">
+            <Suspense fallback={null}>
+              <HeroScene mode="impact" triggerId="impact-track" />
+            </Suspense>
+            <Curtains className="impact-start-curtains" />
+            <div className="impact-copy">
+              <span>AI PRODUCT SYSTEMS</span>
+              <h2>结果不是功能清单。<br />结果是系统真的进入业务。</h2>
+              <p>从中台复用、流量治理到具体工作流，我用可量化结果判断产品是否成立。</p>
+            </div>
+            <div className="impact-metrics">
+              <h3>Selected outcomes</h3>
+              {metrics.map((metric) => (
+                <div key={metric.label}>
+                  <span>{metric.label}</span>
+                  <strong>{metric.value}</strong>
+                </div>
+              ))}
+              <a href="#showreel"><DotLink>See product evidence</DotLink></a>
+            </div>
+            <Curtains className="impact-end-curtains" />
+          </div>
+        </section>
+
+        <div className="light-page evidence-page">
+          <section className="principles-section">
+            <div className="grid-container">
+              <div className="section-spacer"><i /></div>
+              <div className="section-header" data-reveal>
+                <i className="dot" />
+                <h2>The decisions behind the results</h2>
+              </div>
+              <div className="principles-grid">
+                {principles.map((principle) => (
+                  <article key={principle.index} data-reveal>
+                    <div>
+                      <span>{principle.index}</span>
+                      <span>● ● ● ● ●</span>
+                    </div>
+                    <blockquote>
+                      <b>“</b>
+                      <h3>{principle.title}</h3>
+                      <p>{principle.text}<i /></p>
+                    </blockquote>
+                    <footer>
+                      <span>ZHANG ZIJIAN</span>
+                      <small>{principle.label}</small>
+                    </footer>
+                  </article>
                 ))}
               </div>
-              <span className="media-code">SYSTEM EVIDENCE / LIVE PRODUCT UI</span>
+              <div className="section-spacer bottom"><i /></div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="showcase">
-          <div className="showcase-heading" data-reveal>
-            <p className="section-code">05 / VIBE CODING IN PRACTICE</p>
-            <h2>把 AI 能力从 PPT 推进到可操作界面。</h2>
-          </div>
-          <div className="showcase-frame">
-            <img
-              src={asset('ai-studio-script.png')}
-              alt="AI Studio 短视频脚本分析产品界面"
-              loading="lazy"
-              decoding="async"
-            />
-            <div className="showcase-caption">
-              <span>AI STUDIO / SCRIPT REPLICATION</span>
-              <p>业务问题 → 流程拆解 → Prompt → 原型 → Working MVP</p>
-            </div>
-          </div>
-          <div className="showcase-notes">
-            <p>Vibe Coding 对我不是“让 AI 替我写代码”，而是用更低成本把判断变成真实反馈。</p>
-            <div>
-              <span>01 / DEFINE THE JOB</span>
-              <span>02 / BUILD THE SHORTEST LOOP</span>
-              <span>03 / TEST WITH REAL USERS</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="experience" id="about">
-          <div className="section-intro" data-reveal>
-            <p className="section-code">06 / EXPERIENCE</p>
-            <h2>从写代码，到对业务结果负责。</h2>
-          </div>
-          <div className="experience-list">
-            {experiences.map((item, index) => (
-              <article key={`${item.company}-${item.time}`} data-reveal>
-                <span className="experience-index">0{index + 1}</span>
-                <time>{item.time}</time>
-                <div className="experience-role">
-                  <h3>{item.role}</h3>
-                  <p>{item.company}</p>
+          <section className="showreel-track" id="showreel">
+            <div className="showreel-stage grid-container">
+              <div className="showreel-wrap">
+                <div className="showreel-padding">
+                  <div className="showreel-media">
+                    {projects.slice(0, 4).map((project, index) => (
+                      <img
+                        style={{ '--delay': `${index * 3.2}s` } as React.CSSProperties}
+                        src={asset(project.image)}
+                        alt=""
+                        key={project.id}
+                        loading="lazy"
+                      />
+                    ))}
+                    <span>PRODUCT SYSTEMS / 2023—2026</span>
+                  </div>
                 </div>
-                <p className="experience-summary">{item.summary}</p>
-                <span className="experience-code">{item.code}</span>
-              </article>
-            ))}
-          </div>
-        </section>
+              </div>
+            </div>
+          </section>
 
-        <section className="contact" id="contact">
-          <div className="contact-portrait" data-reveal>
-            <img
-              src={`${import.meta.env.BASE_URL}portrait.png`}
-              alt="张子健个人肖像"
-              loading="lazy"
-              decoding="async"
-            />
-            <span>ZHANG ZIJIAN / 2026</span>
-          </div>
-          <div className="contact-copy" data-reveal>
-            <p className="section-code">07 / LET’S START SOMETHING</p>
-            <h2>有复杂的 AI 问题？<br />我们聊聊。</h2>
-            <a href="mailto:1615962561@qq.com">1615962561@qq.com <span>↗</span></a>
-            <div className="contact-meta">
-              <span>HANGZHOU, CHINA</span>
-              <a href="https://github.com/az1615962561-crypto" rel="noreferrer" target="_blank">
-                GITHUB / az1615962561-crypto ↗
-              </a>
-              <span>OPEN TO AI PRODUCT ROLES</span>
+          <section className="experience-section" id="about">
+            <div className="grid-container">
+              <div className="section-header" data-reveal>
+                <i className="dot" />
+                <h2>Experience</h2>
+              </div>
+              <div className="experience-cards">
+                {experiences.map((experience, index) => (
+                  <article key={experience.time} data-reveal>
+                    <div className="experience-image">
+                      <img
+                        src={asset(experienceImages[index])}
+                        alt=""
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="experience-body">
+                      <time>{experience.time}</time>
+                      <div><span>{experience.code}</span></div>
+                      <h3>{experience.role}</h3>
+                      <h4>{experience.company}</h4>
+                      <p>{experience.summary}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section className="contact-section" id="contact">
+          <div className="contact-grid">
+            <div className="contact-image">
+              <img src={publicAsset('portrait.png')} alt="张子健个人肖像" />
+            </div>
+            <div className="contact-copy">
+              <span>READY TO START SOMETHING?</span>
+              <h2>有复杂的 AI 产品问题？<br />我们聊聊。</h2>
+              <a href="mailto:1615962561@qq.com">1615962561@qq.com ↗</a>
+              <div>
+                <span>HANGZHOU, CHINA</span>
+                <a href="https://github.com/az1615962561-crypto" target="_blank" rel="noreferrer">
+                  GITHUB ↗
+                </a>
+                <a href="#top">BACK TO TOP ↑</a>
+              </div>
             </div>
           </div>
         </section>
       </main>
-
-      <footer>
-        <span>ZHANG ZIJIAN © 2026</span>
-        <span>PRODUCT THINKING / AI SYSTEMS / VIBE CODING</span>
-        <a href="#top">BACK TO TOP ↑</a>
-      </footer>
     </div>
   )
 }
