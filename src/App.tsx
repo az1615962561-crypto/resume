@@ -242,7 +242,7 @@ function App() {
 
         <section className="contact section-grid" id="contact">
           <div className="portrait-wrap" data-reveal>
-            <img src="/portrait.png" alt="张子健个人肖像" />
+            <img src={`${import.meta.env.BASE_URL}portrait.png`} alt="张子健个人肖像" />
             <span>PORTRAIT / CURRENT ASSET</span>
           </div>
           <div className="contact-copy" data-reveal>
