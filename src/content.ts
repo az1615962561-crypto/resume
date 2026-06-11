@@ -1,40 +1,154 @@
+export type ProjectCategory = 'PLATFORM' | 'GOVERNANCE' | 'BUSINESS AI'
+
+export type Project = {
+  id: string
+  index: string
+  category: ProjectCategory
+  title: string
+  subtitle: string
+  image: string
+  result: string
+  description: string
+  tags: string[]
+  featured?: boolean
+}
+
 export const metrics = [
-  { value: '10亿+', label: '日均 Token 处理量' },
-  { value: '10万+', label: '平台日调用量' },
-  { value: '100+', label: 'Agent 应用沉淀' },
-  { value: '10+', label: 'AI 业务产线' },
+  { value: '10亿+', label: '日均 Token 处理量', note: '企业级 AI 网关' },
+  { value: '100+', label: 'Agent 应用沉淀', note: '跨 10+ 业务产线' },
+  { value: '20%', label: '业务平均提效', note: 'AI Studio 工具集' },
+  { value: '3季度', label: '研发投入节省', note: '开源能力融合决策' },
 ]
 
-export const cases = [
+export const projects: Project[] = [
   {
+    id: 'eureka-orchestration',
     index: '01',
-    type: 'AI INFRASTRUCTURE',
+    category: 'PLATFORM',
     title: '尤里卡 AI Agent 中台',
-    summary:
-      '从单点能力平台演进为公司级 AI 中台底座，覆盖能力接入、编排、调试、发布与运维。',
-    result: '节省约 3 个季度开发人力',
-    detail: '主导 5 层产品架构，并推动 Dify 与编排层融合。',
-    status: 'CASE STUDY / AVAILABLE',
+    subtitle: '把零散 AI 能力变成公司级生产系统',
+    image: 'eureka-orchestration.png',
+    result: '100+ AGENTS / 10万+ 日调用',
+    description:
+      '从 0 到 1 规划五层产品架构，覆盖模型接入、应用编排、知识库、资源管理、调试发布与企业治理。',
+    tags: ['AGENT', 'WORKFLOW', 'RAG', 'MCP'],
+    featured: true,
   },
   {
+    id: 'gateway-observability',
     index: '02',
-    type: 'AI GOVERNANCE',
-    title: '企业级 AI 网关',
-    summary:
-      '以四层网关统一 AI 流量的出入、调度与观测，解决 Key 管理、成本和数据安全问题。',
-    result: '日均处理 Token 10亿+',
-    detail: '子网关 / 出口网关 / 观测网关 / 入口网关。',
-    status: 'CASE STUDY / NEEDS MORE MATERIAL',
+    category: 'GOVERNANCE',
+    title: 'AI 网关观测中心',
+    subtitle: '让稳定性、容量、安全与成本可被管理',
+    image: 'gateway-observability.png',
+    result: '10亿+ TOKEN / DAY',
+    description:
+      '用统一观测视角承接多模型、多团队和多业务流量，让异常、容量和成本从黑盒变成决策依据。',
+    tags: ['OBSERVABILITY', 'CAPACITY', 'COST'],
   },
   {
+    id: 'gateway-models',
     index: '03',
-    type: 'VIBE CODING',
-    title: 'AI Studio 业务工具',
-    summary:
-      '用 Vibe Coding 叠加中台原子能力，快速交付脚本检测、投流分析和脚本复刻工具。',
-    result: '业务人员平均提效 20%',
-    detail: '从业务问题、原型到可用 MVP 的快速闭环。',
-    status: 'LIVE DEMO / TO BE ADDED',
+    category: 'GOVERNANCE',
+    title: '模型出口网关',
+    subtitle: '统一模型、凭证、授权与调用策略',
+    image: 'gateway-models.png',
+    result: '4-LAYER GATEWAY',
+    description:
+      '围绕子网关、出口、观测与入口四层治理模型，解决 Key 管理、路由、数据安全和用量核算。',
+    tags: ['MODEL ROUTING', 'KEY', 'SECURITY'],
+  },
+  {
+    id: 'ai-studio',
+    index: '04',
+    category: 'BUSINESS AI',
+    title: 'Eureka AI Studio',
+    subtitle: '从中台原子能力到业务可用工具',
+    image: 'ai-studio-home.png',
+    result: '3 条产品线完成 AI 化',
+    description:
+      '将 Agent、模型与知识能力包装成业务人员可直接使用的工作台，用更短反馈链验证业务价值。',
+    tags: ['VIBE CODING', 'MVP', 'AI TOOL'],
+    featured: true,
+  },
+  {
+    id: 'media-analysis',
+    index: '05',
+    category: 'BUSINESS AI',
+    title: '投流素材效果分析',
+    subtitle: '把视频素材判断拆成可执行工作流',
+    image: 'ai-studio-media.png',
+    result: '平均效率提升 20%',
+    description:
+      '支持素材导入、规则配置和结构化分析，减少运营人员在重复观看、摘录与横向比较上的时间。',
+    tags: ['MULTIMODAL', 'ANALYSIS', 'OPS'],
+  },
+  {
+    id: 'script-analysis',
+    index: '06',
+    category: 'BUSINESS AI',
+    title: '短视频脚本复刻',
+    subtitle: '把爆款拆解能力产品化',
+    image: 'ai-studio-script.png',
+    result: 'IDEA → WORKING MVP',
+    description:
+      '从业务问题、提示词结构到可编辑结果页，以 Vibe Coding 快速完成原型和可用版本的闭环。',
+    tags: ['PROMPT', 'CONTENT', 'PROTOTYPE'],
+  },
+]
+
+export const capabilities = [
+  {
+    number: '01',
+    title: 'Product',
+    cn: '产品判断',
+    description: '把模糊的业务诉求拆成用户、场景、约束与可验证指标。',
+    items: ['0—1 产品规划', '业务流程重构', '需求优先级与取舍', '增长与商业化'],
+  },
+  {
+    number: '02',
+    title: 'Systems',
+    cn: '系统设计',
+    description: '在模型能力、工程成本和企业治理之间建立可演进的产品结构。',
+    items: ['Agent / Workflow', 'AI Gateway', 'RAG / MCP / Memory', '模型训练与评估平台'],
+  },
+  {
+    number: '03',
+    title: 'Build',
+    cn: '快速构建',
+    description: '用原型与代码缩短讨论周期，让关键假设尽早进入真实反馈。',
+    items: ['Vibe Coding', 'React / Vue', 'Figma / Axure', 'SQL / 数据分析'],
+  },
+]
+
+export const impactSlides = [
+  {
+    value: '10亿+',
+    label: 'TOKEN / DAY',
+    title: '规模不是一句“支持高并发”',
+    description: '把流量入口、模型出口、观测与子网关拆成四层，才让容量、成本与安全可以分别治理。',
+    image: 'gateway-observability.png',
+  },
+  {
+    value: '100+',
+    label: 'AGENTS IN PRODUCTION',
+    title: '平台价值来自复用，不是功能数量',
+    description: '围绕编排、知识、资源和发布链路沉淀公共能力，让不同产线不必重复建设。',
+    image: 'eureka-orchestration.png',
+  },
+  {
+    value: '20%',
+    label: 'EFFICIENCY LIFT',
+    title: 'AI 最终要进入具体工作流',
+    description: '把模型能力嵌入素材分析与脚本生产，结果由业务人员的真实使用效率来验证。',
+    image: 'ai-studio-media.png',
+  },
+  {
+    value: '3季度',
+    label: 'ENGINEERING SAVED',
+    title: '好的产品决策也包括“不自研”',
+    description: '选择融合成熟开源编排能力，把研发资源留给企业治理、资产沉淀和业务差异化。',
+    image: 'ai-studio-home.png',
   },
 ]
 
@@ -43,37 +157,21 @@ export const experiences = [
     time: '2025.06 — NOW',
     role: 'AI 产品经理',
     company: '乐其集团',
-    summary: '企业级 AI Agent 中台、AI 网关与 AI Studio。',
+    summary: '负责企业级 AI Agent 中台、四层 AI 网关与 AI Studio，推动 10+ 业务产线 AI 化。',
+    code: 'AI INFRA / BUSINESS AI',
   },
   {
     time: '2024.10 — 2025.03',
     role: 'AI 产品经理',
     company: '杭州谐云科技有限公司',
-    summary: '模型训练数据、算力平台、模型评估与跨团队交付。',
+    summary: '参与数据标注、算力调度、模型训练与评估平台，跨算法和工程团队推进交付。',
+    code: 'MLOPS / PLATFORM',
   },
   {
     time: '2023.10 — 2024.05',
     role: '合伙人',
     company: '苏州轻练健康科技有限公司',
-    summary: '运动科技产品从 0 到 1，覆盖选品、获客、运营与分润。',
-  },
-]
-
-export const contentRequests = [
-  {
-    title: '案例原始材料',
-    items: ['产品截图或原型', '架构图 / 流程图', '关键 PRD', '上线前后对比'],
-  },
-  {
-    title: '你的真实判断',
-    items: ['最难的一次取舍', '被推翻的方案', '如何说服技术与业务', '项目复盘与遗憾'],
-  },
-  {
-    title: '简历之外',
-    items: ['未写进简历的项目', '个人 AI 小工具', '文章 / 分享', '比赛、奖项或社区经历'],
-  },
-  {
-    title: '个人信息',
-    items: ['希望公开的联系方式', 'GitHub / 即刻 / LinkedIn', '目标岗位与城市', '一句个人宣言'],
+    summary: '从产品、获客到运营参与运动科技业务 0—1，月营收 10 万，毛利率 32%。',
+    code: '0—1 / GROWTH',
   },
 ]
