@@ -309,7 +309,7 @@ export function HeroScene() {
     let lastScrollY = window.scrollY
     let frame = 0
     let isVisible = true
-    const clock = new THREE.Clock()
+    const startTime = performance.now()
     const panelWorldPosition = new THREE.Vector3()
 
     const resize = () => {
@@ -337,11 +337,11 @@ export function HeroScene() {
       pointer.y = -((event.clientY / window.innerHeight) * 2 - 1)
     }
 
-    const render = () => {
+    const render = (timestamp = performance.now()) => {
       frame = window.requestAnimationFrame(render)
       if (!isVisible) return
 
-      const time = clock.getElapsedTime()
+      const time = (timestamp - startTime) / 1000
       const easedProgress = scrollProgress * scrollProgress * (3 - 2 * scrollProgress)
 
       smoothPointer.lerp(pointer, 0.045)
