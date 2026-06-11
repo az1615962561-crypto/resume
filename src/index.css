@@ -1,0 +1,72 @@
+:root {
+  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  color: #eef2f6;
+  background: #07090d;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --bg: #07090d;
+  --surface: #0c1016;
+  --surface-light: #111821;
+  --text: #eef2f6;
+  --muted: #8d98a6;
+  --line: rgba(216, 228, 241, 0.15);
+  --line-strong: rgba(216, 228, 241, 0.28);
+  --accent: #6eb4ff;
+  --accent-bright: #a9d3ff;
+  --mono: 'SFMono-Regular', 'Roboto Mono', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  color: inherit;
+}
+
+::selection {
+  color: #07111c;
+  background: var(--accent-bright);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
