@@ -10,6 +10,7 @@ import {
   projects,
   type ProjectCategory,
 } from './content'
+import { HeroScene } from './HeroScene'
 import './App.css'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
@@ -236,6 +237,7 @@ function App() {
               onPointerLeave={resetPointer}
               aria-label="由真实项目界面组成的交互式 AI 产品系统视觉"
             >
+              <HeroScene />
               <div className="hero-grid" />
               <figure className="visual-window visual-window-a">
                 <img src={asset('eureka-orchestration.png')} alt="" decoding="async" fetchPriority="high" />

@@ -190,6 +190,15 @@
   isolation: isolate;
 }
 
+.hero-scene-canvas {
+  position: absolute;
+  z-index: -1;
+  inset: -24%;
+  width: 148%;
+  height: 148%;
+  pointer-events: none;
+}
+
 .hero-visual::before,
 .hero-visual::after {
   content: '';
