@@ -40,12 +40,22 @@ export type ResumeBullet = {
   }>
 }
 
+export type ResumeMedia = {
+  file: string
+  sourceName: string
+  alt: string
+}
+
 export type ResumeExperience = {
   section: string
   time: string
   company: string
   role: string
   bullets: ResumeBullet[]
+  /** 段落级证据图（如创业经历的门店实拍） */
+  media?: ResumeMedia[]
+  /** 自有产品图（白底产品拆解图，单独成组展示） */
+  productMedia?: ResumeMedia[]
   missingMedia?: string[]
 }
 
@@ -148,7 +158,35 @@ export const experiences: ResumeExperience[] = [
         text: '针对运动时间碎片化、教练管理低效等问题，降低运营成本30%',
       },
     ],
-    missingMedia: ['运动科技产品图', '线下门店或沉浸式体验场景图', '运营或增长数据截图'],
+    media: [
+      {
+        file: 'qinglian-store-01.jpg',
+        sourceName: '轻练门店',
+        alt: '苏州轻练线下门店训练区',
+      },
+      {
+        file: 'qinglian-store-02.jpg',
+        sourceName: '轻练课程',
+        alt: '沉浸式课程体验场景',
+      },
+      {
+        file: 'qinglian-store-03.jpg',
+        sourceName: '轻练品牌',
+        alt: '门店前台与品牌墙',
+      },
+    ],
+    productMedia: [
+      {
+        file: 'qinglian-product-01.png',
+        sourceName: '超模训练机',
+        alt: 'Gogo Tremble 超模训练机 · 自有工厂生产',
+      },
+      {
+        file: 'qinglian-product-02.png',
+        sourceName: '超模训练衣',
+        alt: 'Gogo Pro 超模训练衣 · EMS 电脉冲技术',
+      },
+    ],
   },
   {
     section: '实习经历',
@@ -173,6 +211,5 @@ export const experiences: ResumeExperience[] = [
         text: '协调重庆数智与总部技术团队，推动重庆数智平台的按时上线。通过Scrum敏捷方法管理项目进度，基于用户反馈进行功能迭代优化，重点改善了模型在线测试，最终使算法工程师操作效率提高30%，客户满意度提升。',
       },
     ],
-    missingMedia: ['数据采集与标注平台截图', '算力平台截图', '模型评估或模型在线测试截图'],
   },
 ]

@@ -13,6 +13,9 @@ dist-ssr
 *.local
 打开Demo.html
 
+# Local agent tooling
+.claude/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
